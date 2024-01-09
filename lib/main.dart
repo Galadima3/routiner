@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+
 import 'package:google_fonts/google_fonts.dart';
+import 'package:routiner/src/features/onboarding/presentation/screens/onboarding_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  runApp(const MyApp());
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  final hasOnboardingWorked = prefs.getBool('onboardingViewed') ?? false;
+  runApp(MyApp(
+    hasOnboardingWorked: hasOnboardingWorked,
+  ));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({super.key, required this.hasOnboardingWorked});
+  final bool hasOnboardingWorked;
 
   // This widget is the root of your application.
   @override
@@ -22,8 +28,10 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF3843FF)),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-      //home: SplashScreen(),
+      //home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: hasOnboardingWorked
+          ? const MyHomePage(title: "Home Page")
+          : const OnboardingScreen(),
     );
   }
 }
@@ -64,11 +72,6 @@ class _MyHomePageState extends State<MyHomePage> {
               '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
-            SvgPicture.asset(
-              'asset/images/tick.svg',
-              width: 100,
-              height: 100,
-            )
           ],
         ),
       ),
